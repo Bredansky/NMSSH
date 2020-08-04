@@ -8,7 +8,6 @@
 
 - (BOOL)writeStream:(NSInputStream *)inputStream toSFTPHandle:(LIBSSH2_SFTP_HANDLE *)handle;
 - (BOOL)writeStream:(NSInputStream *)inputStream toSFTPHandle:(LIBSSH2_SFTP_HANDLE *)handle progress:(BOOL (^)(NSUInteger))progress;
-- (BOOL)readContentsAtPath:(NSString *)path toStream:(NSOutputStream *)stream progress:(BOOL (^)(NSUInteger, NSUInteger))progress;
 @end
 
 @implementation NMSFTP
@@ -235,71 +234,38 @@
 }
 
 - (NSData *)contentsAtPath:(NSString *)path progress:(BOOL (^)(NSUInteger, NSUInteger))progress {
-    NSOutputStream *outputStream = [NSOutputStream outputStreamToMemory];
-    
-    BOOL success = [self readContentsAtPath:path toStream:outputStream progress:progress];
-    
-    if (success) {
-        return [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-    } else {
+    LIBSSH2_SFTP_HANDLE *handle = [self openFileAtPath:path flags:LIBSSH2_FXF_READ mode:0];
+
+    if (!handle) {
         return nil;
     }
-}
 
-- (BOOL)contentsAtPath:(NSString *)path toStream:(NSOutputStream *)outputStream progress:(BOOL (^)(NSUInteger, NSUInteger))progress {
-    return [self readContentsAtPath:path toStream:outputStream progress:progress];
-}
-
-- (BOOL)readContentsAtPath:(NSString *)path toStream:(NSOutputStream *)outputStream progress:(BOOL (^)(NSUInteger, NSUInteger))progress {
-    LIBSSH2_SFTP_HANDLE *handle = [self openFileAtPath:path flags:LIBSSH2_FXF_READ mode:0];
-    
-    if (!handle) {
-        return NO;
-    }
-    
     NMSFTPFile *file = [self infoForFileAtPath:path];
     if (!file) {
         NMSSHLogWarn(@"contentsAtPath:progress: failed to get file attributes");
-        return NO;
-    }
-    
-    if ([outputStream streamStatus] == NSStreamStatusNotOpen) {
-        [outputStream open];
+        return nil;
     }
     
     char buffer[self.bufferSize];
+    NSMutableData *data = [[NSMutableData alloc] init];
     ssize_t rc;
-    NSUInteger got = 0;
+    off_t got = 0;
     while ((rc = libssh2_sftp_read(handle, buffer, (ssize_t)sizeof(buffer))) > 0) {
-        NSUInteger remainingBytes = rc;
-        NSInteger writeResult;
-        do {
-            writeResult = [outputStream write:(const uint8_t *)&buffer maxLength:remainingBytes];
-            remainingBytes -= MAX(0, writeResult);
-        } while (remainingBytes > 0 && writeResult > 0);
-        
-        if (writeResult < 0 || (writeResult == 0 && remainingBytes > 0)) {
-            libssh2_sftp_close(handle);
-            [outputStream close];
-            return NO;
-        }
-        
+        [data appendBytes:buffer length:rc];
         got += rc;
-        if (progress && !progress(got, (NSUInteger)[file.fileSize integerValue])) {
+        if (progress && !progress((NSUInteger)got, (NSUInteger)[file.fileSize integerValue])) {
             libssh2_sftp_close(handle);
-            [outputStream close];
-            return NO;
+            return nil;
         }
     }
-    
+
     libssh2_sftp_close(handle);
-    [outputStream close];
-    
+
     if (rc < 0) {
-        return NO;
+        return nil;
     }
-    
-    return YES;
+
+    return [data copy];
 }
 
 - (BOOL)writeContents:(NSData *)contents toFileAtPath:(NSString *)path {

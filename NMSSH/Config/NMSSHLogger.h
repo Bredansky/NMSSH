@@ -21,7 +21,7 @@ typedef NS_OPTIONS(NSUInteger, NMSSHLogLevel) {
  
  @returns Shared logger
  */
-+ (nonnull instancetype)logger NS_SWIFT_NAME(shared());
++ (instancetype) sharedLogger;
 
 /// ----------------------------------------------------------------------------
 /// @name Logger settings
@@ -38,7 +38,7 @@ typedef NS_OPTIONS(NSUInteger, NMSSHLogLevel) {
  _level_ - Log level<br>
  _format_ - Log message
  */
-@property (nonatomic, nonnull, copy) void (^logBlock)(NMSSHLogLevel level, NSString * _Nonnull format);
+@property (nonatomic, copy) void (^logBlock)(NMSSHLogLevel level, NSString *format);
 
 /** The maximum log level */
 @property (nonatomic, assign) NMSSHLogLevel logLevel;
@@ -55,27 +55,27 @@ typedef NS_OPTIONS(NSUInteger, NMSSHLogLevel) {
 
  @param format Log message
  */
-- (void)logVerbose:(nonnull NSString *)format;
+- (void)logVerbose:(NSString *)format;
 
 /**
  Log with info level
 
  @param format Log message
  */
-- (void)logInfo:(nonnull NSString *)format;
+- (void)logInfo:(NSString *)format;
 
 /**
  Log with warn level
 
  @param format Log message
  */
-- (void)logWarn:(nonnull NSString *)format;
+- (void)logWarn:(NSString *)format;
 
 /**
  Log with error level
 
  @param format Log message
  */
-- (void)logError:(nonnull NSString *)format;
+- (void)logError:(NSString *)format;
 
 @end

@@ -37,7 +37,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
 @interface NMSSHChannel : NSObject
 
 /** A valid NMSSHSession instance */
-@property (nonatomic, nonnull, readonly) NMSSHSession *session;
+@property (nonatomic, readonly) NMSSHSession *session;
 
 /** Size of the buffers used by the channel, defaults to 0x4000 */
 @property (nonatomic, assign) NSUInteger bufferSize;
@@ -51,7 +51,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
 
  You can use the `delegate` to receive asynchronous read from a shell.
  */
-@property (nonatomic, nullable, weak) id<NMSSHChannelDelegate> delegate;
+@property (nonatomic, weak) id<NMSSHChannelDelegate> delegate;
 
 /// ----------------------------------------------------------------------------
 /// @name Initializer
@@ -60,22 +60,20 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
 /** Current channel type or `NMSSHChannelTypeClosed` if the channel is closed */
 @property (nonatomic, readonly) NMSSHChannelType type;
 
-- (nonnull instancetype)init NS_UNAVAILABLE;
-
 /**
  Create a new NMSSHChannel instance.
 
  @param session A valid, connected, NMSSHSession instance
  @returns New NMSSHChannel instance
  */
-- (nonnull instancetype)initWithSession:(nonnull NMSSHSession *)session;
+- (instancetype)initWithSession:(NMSSHSession *)session;
 
 /// ----------------------------------------------------------------------------
 /// @name Shell command execution
 /// ----------------------------------------------------------------------------
 
 /** The last response from a shell command execution */
-@property (nonatomic, nullable, readonly) NSString *lastResponse;
+@property (nonatomic, readonly) NSString *lastResponse;
 
 /** Request a pseudo terminal before executing a command */
 @property (nonatomic, assign) BOOL requestPty;
@@ -94,7 +92,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param error Error handler
  @returns Shell command response
  */
-- (nonnull NSString *)execute:(nonnull NSString *)command error:(NSError * _Nullable * _Nullable)error;
+- (NSString *)execute:(NSString *)command error:(NSError **)error;
 
 /**
  Execute a shell command on the server with a given timeout.
@@ -108,14 +106,14 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param timeout The time to wait (in seconds) before giving up on the request
  @returns Shell command response
  */
-- (nullable NSString *)execute:(nonnull NSString *)command error:(NSError * _Nullable * _Nullable)error timeout:(nonnull NSNumber *)timeout;
+- (NSString *)execute:(NSString *)command error:(NSError **)error timeout:(NSNumber *)timeout;
 
 /// ----------------------------------------------------------------------------
 /// @name Remote shell session
 /// ----------------------------------------------------------------------------
 
 /** User-defined environment variables for the session, defaults to `nil` */
-@property (nonatomic, nullable, strong) NSDictionary *environmentVariables;
+@property (nonatomic, strong) NSDictionary *environmentVariables;
 
 /**
  Request a remote shell on the channel.
@@ -127,7 +125,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param error Error handler
  @returns Shell initialization success
  */
-- (BOOL)startShell:(NSError * _Nullable * _Nullable)error;
+- (BOOL)startShell:(NSError **)error;
 
 /**
  Close a remote shell on an active channel.
@@ -143,7 +141,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param error Error handler
  @returns Shell write success
  */
-- (BOOL)write:(nonnull NSString *)command error:(NSError * _Nullable * _Nullable)error;
+- (BOOL)write:(NSString *)command error:(NSError **)error;
 
 /**
  Write a command on the remote shell with a given timeout.
@@ -155,7 +153,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param timeout The time to wait (in seconds) before giving up on the request
  @returns Shell write success
  */
-- (BOOL)write:(nonnull NSString *)command error:(NSError * _Nullable * _Nullable)error timeout:(nonnull NSNumber *)timeout;
+- (BOOL)write:(NSString *)command error:(NSError **)error timeout:(NSNumber *)timeout;
 
 /**
  Write data on the remote shell.
@@ -166,7 +164,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param error Error handler
  @returns Shell write success
  */
-- (BOOL)writeData:(nonnull NSData *)data error:(NSError * _Nullable * _Nullable)error;
+- (BOOL)writeData:(NSData *)data error:(NSError **)error;
 
 /**
  Write data on the remote shell with a given timeout.
@@ -178,7 +176,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param timeout The time to wait (in seconds) before giving up on the request
  @returns Shell write success
  */
-- (BOOL)writeData:(nonnull NSData *)data error:(NSError * _Nullable * _Nullable)error timeout:(nonnull NSNumber *)timeout;
+- (BOOL)writeData:(NSData *)data error:(NSError **)error timeout:(NSNumber *)timeout;
 
 /**
  Request size for the remote pseudo terminal.
@@ -205,7 +203,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param remotePath Path to save the file to
  @returns SCP upload success
  */
-- (BOOL)uploadFile:(nonnull NSString *)localPath to:(nonnull NSString *)remotePath;
+- (BOOL)uploadFile:(NSString *)localPath to:(NSString *)remotePath;
 
 /**
  Download a remote file to local the filesystem.
@@ -217,7 +215,7 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param localPath Path to save the file to
  @returns SCP download success
  */
-- (BOOL)downloadFile:(nonnull NSString *)remotePath to:(nonnull NSString *)localPath;
+- (BOOL)downloadFile:(NSString *)remotePath to:(NSString *)localPath;
 
 /**
  Download a remote file to local the filesystem.
@@ -231,9 +229,9 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
         Returns NO to abort.
  @returns SCP download success
  */
-- (BOOL)downloadFile:(nonnull NSString *)remotePath
-                  to:(nonnull NSString *)localPath
-            progress:(BOOL (^_Nullable)(NSUInteger, NSUInteger))progress;
+- (BOOL)downloadFile:(NSString *)remotePath
+                  to:(NSString *)localPath
+            progress:(BOOL (^)(NSUInteger, NSUInteger))progress;
 
 /**
  Upload a local file to a remote server.
@@ -246,9 +244,9 @@ typedef NS_ENUM(NSInteger, NMSSHChannelType)  {
  @param progress Method called periodically with number of bytes uploaded. Returns NO to abort.
  @returns SCP upload success
  */
-- (BOOL)uploadFile:(nonnull NSString *)localPath
-                to:(nonnull NSString *)remotePath
-          progress:(BOOL (^_Nullable)(NSUInteger))progress;
+- (BOOL)uploadFile:(NSString *)localPath
+                to:(NSString *)remotePath
+          progress:(BOOL (^)(NSUInteger))progress;
 
 
 @end

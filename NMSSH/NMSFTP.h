@@ -8,7 +8,7 @@
 @interface NMSFTP : NSObject
 
 /** A valid NMSSHSession instance */
-@property (nonatomic, nonnull, readonly) NMSSHSession *session;
+@property (nonatomic, readonly) NMSSHSession *session;
 
 /** Property that keeps track of connection status to the server */
 @property (nonatomic, readonly, getter = isConnected) BOOL connected;
@@ -26,7 +26,7 @@
  @param session A valid, connected, NMSSHSession instance
  @returns Connected NMSFTP instance
  */
-+ (nonnull instancetype)connectWithSession:(nonnull NMSSHSession *)session;
++ (instancetype)connectWithSession:(NMSSHSession *)session;
 
 /**
  Create a new NMSFTP instance.
@@ -34,7 +34,7 @@
  @param session A valid, connected, NMSSHSession instance
  @returns New NMSFTP instance
  */
-- (nonnull instancetype)initWithSession:(nonnull NMSSHSession *)session;
+- (instancetype)initWithSession:(NMSSHSession *)session;
 
 /// ----------------------------------------------------------------------------
 /// @name Connection
@@ -63,7 +63,7 @@
  @param destPath Destination to move to
  @returns Move success
  */
-- (BOOL)moveItemAtPath:(nonnull NSString *)sourcePath toPath:(nonnull NSString *)destPath;
+- (BOOL)moveItemAtPath:(NSString *)sourcePath toPath:(NSString *)destPath;
 
 /// ----------------------------------------------------------------------------
 /// @name Manipulate directories
@@ -77,7 +77,7 @@
  @param path Path to check
  @returns YES if file exists
  */
-- (BOOL)directoryExistsAtPath:(nonnull NSString *)path;
+- (BOOL)directoryExistsAtPath:(NSString *)path;
 
 /**
  Create a directory at path
@@ -85,7 +85,7 @@
  @param path Path to directory
  @returns Creation success
  */
-- (BOOL)createDirectoryAtPath:(nonnull NSString *)path;
+- (BOOL)createDirectoryAtPath:(NSString *)path;
 
 /**
  Remove directory at path
@@ -93,7 +93,7 @@
  @param path Existing directory
  @returns Remove success
  */
-- (BOOL)removeDirectoryAtPath:(nonnull NSString *)path;
+- (BOOL)removeDirectoryAtPath:(NSString *)path;
 
 /**
  Get a list of files for a directory path
@@ -101,7 +101,7 @@
  @param path Existing directory to list items from
  @returns List of relative paths
  */
-- (nullable NSArray<NMSFTPFile *> *)contentsOfDirectoryAtPath:(nonnull NSString *)path;
+- (NSArray *)contentsOfDirectoryAtPath:(NSString *)path;
 
 /// ----------------------------------------------------------------------------
 /// @name Manipulate symlinks and files
@@ -113,7 +113,7 @@
  @param path An existing file path
  @return A NMSFTPFile that contains the fetched file attributes.
  */
-- (nullable NMSFTPFile *)infoForFileAtPath:(nonnull NSString *)path;
+- (NMSFTPFile *)infoForFileAtPath:(NSString *)path;
 
 /**
  Test if a file exists at the specified path.
@@ -123,7 +123,7 @@
  @param path Path to check
  @returns YES if file exists
  */
-- (BOOL)fileExistsAtPath:(nonnull NSString *)path;
+- (BOOL)fileExistsAtPath:(NSString *)path;
 
 /**
  Create a symbolic link
@@ -132,8 +132,8 @@
  @param destPath Path the link will be created at
  @returns Creation success
  */
-- (BOOL)createSymbolicLinkAtPath:(nonnull NSString *)linkPath
-             withDestinationPath:(nonnull NSString *)destPath;
+- (BOOL)createSymbolicLinkAtPath:(NSString *)linkPath
+             withDestinationPath:(NSString *)destPath;
 
 /**
  Remove file at path
@@ -141,7 +141,7 @@
  @param path Path to existing file
  @returns Remove success
  */
-- (BOOL)removeFileAtPath:(nonnull NSString *)path;
+- (BOOL)removeFileAtPath:(NSString *)path;
 
 /**
  Read the contents of a file
@@ -149,7 +149,7 @@
  @param path An existing file path
  @returns File contents
  */
-- (nullable NSData *)contentsAtPath:(nonnull NSString *)path;
+- (NSData *)contentsAtPath:(NSString *)path;
 
 /**
  Refer to contentsAtPath:
@@ -161,19 +161,7 @@
         Returns NO to abort. 
  @returns File contents
  */
-- (nullable NSData *)contentsAtPath:(nonnull NSString *)path progress:(BOOL (^_Nullable)(NSUInteger got, NSUInteger totalBytes))progress;
-
-/**
- Refer to contentsAtPath:
- 
- This adds the ability to get periodic updates to bytes received.
- 
- @param path An existing file path
- @param stream Stream to write bytes to
- @param progress Method called periodically with number of bytes downloaded and total file size. Returns NO to abort.
- @return File read success
- */
-- (BOOL)contentsAtPath:(nonnull NSString *)path toStream:(nonnull NSOutputStream *)stream progress:(BOOL (^_Nullable)(NSUInteger, NSUInteger))progress;
+- (NSData *)contentsAtPath:(NSString *)path progress:(BOOL (^)(NSUInteger got, NSUInteger totalBytes))progress;
 
 /**
  Overwrite the contents of a file
@@ -184,7 +172,7 @@
  @param path File path to write bytes at
  @returns Write success
  */
-- (BOOL)writeContents:(nonnull NSData *)contents toFileAtPath:(nonnull NSString *)path;
+- (BOOL)writeContents:(NSData *)contents toFileAtPath:(NSString *)path;
 
 /**
  Refer to writeContents:toFileAtPath:
@@ -197,7 +185,7 @@
         Returns NO to abort.
  @returns Write success
  */
-- (BOOL)writeContents:(nonnull NSData *)contents toFileAtPath:(nonnull NSString *)path progress:(BOOL (^_Nullable)(NSUInteger sent))progress;
+- (BOOL)writeContents:(NSData *)contents toFileAtPath:(NSString *)path progress:(BOOL (^)(NSUInteger sent))progress;
 
 /**
  Overwrite the contents of a file
@@ -208,7 +196,7 @@
  @param path File path to write bytes at
  @returns Write success
  */
-- (BOOL)writeFileAtPath:(nonnull NSString *)localPath toFileAtPath:(nonnull NSString *)path;
+- (BOOL)writeFileAtPath:(NSString *)localPath toFileAtPath:(NSString *)path;
 
 /**
  Refer to writeFileAtPath:toFileAtPath:
@@ -221,7 +209,7 @@
         Returns NO to abort.
  @returns Write success
  */
-- (BOOL)writeFileAtPath:(nonnull NSString *)localPath toFileAtPath:(nonnull NSString *)path progress:(BOOL (^_Nullable)(NSUInteger sent))progress;
+- (BOOL)writeFileAtPath:(NSString *)localPath toFileAtPath:(NSString *)path progress:(BOOL (^)(NSUInteger sent))progress;
 
 /**
  Overwrite the contents of a file
@@ -232,7 +220,7 @@
  @param path File path to write bytes at
  @returns Write success
  */
-- (BOOL)writeStream:(nonnull NSInputStream *)inputStream toFileAtPath:(nonnull NSString *)path;
+- (BOOL)writeStream:(NSInputStream *)inputStream toFileAtPath:(NSString *)path;
 
 /**
  Refer to writeStream:toFileAtPath:
@@ -245,7 +233,7 @@
         Returns NO to abort.
  @returns Write success
  */
-- (BOOL)writeStream:(nonnull NSInputStream *)inputStream toFileAtPath:(nonnull NSString *)path progress:(BOOL (^_Nullable)(NSUInteger sent))progress;
+- (BOOL)writeStream:(NSInputStream *)inputStream toFileAtPath:(NSString *)path progress:(BOOL (^)(NSUInteger sent))progress;
 
 /**
  Start or resume writing the contents of a file
@@ -260,7 +248,7 @@
         Returns NO to abort.
  @returns Write success
  */
-- (BOOL)resumeFileAtPath:(nonnull NSString *)localPath toFileAtPath:(nonnull NSString *)path progress:(BOOL (^_Nullable)(NSUInteger delta, NSUInteger totalBytes))progress;
+- (BOOL)resumeFileAtPath:(NSString *)localPath toFileAtPath:(NSString *)path progress:(BOOL (^)(NSUInteger delta, NSUInteger totalBytes))progress;
 
 /**
  Start or resume writing the contents of a file
@@ -275,7 +263,7 @@
         Returns NO to abort.
  @returns Write success
  */
-- (BOOL)resumeStream:(nonnull NSInputStream *)inputStream toFileAtPath:(nonnull NSString *)path progress:(BOOL (^_Nullable)(NSUInteger delta, NSUInteger totalBytes))progress;
+- (BOOL)resumeStream:(NSInputStream *)inputStream toFileAtPath:(NSString *)path progress:(BOOL (^)(NSUInteger delta, NSUInteger totalBytes))progress;
 
 /**
  Append contents to the end of a file
@@ -286,7 +274,7 @@
  @param path File path to write bytes at
  @returns Append success
  */
-- (BOOL)appendContents:(nonnull NSData *)contents toFileAtPath:(nonnull NSString *)path;
+- (BOOL)appendContents:(NSData *)contents toFileAtPath:(NSString *)path;
 
 /**
  Append contents to the end of a file
@@ -297,7 +285,7 @@
  @param path File path to write bytes at
  @returns Append success
  */
-- (BOOL)appendStream:(nonnull NSInputStream *)inputStream toFileAtPath:(nonnull NSString *)path;
+- (BOOL)appendStream:(NSInputStream *)inputStream toFileAtPath:(NSString *)path;
 
 /**
  Copy a file remotely.
@@ -305,6 +293,6 @@
  @param fromPath Path to copy from
  @param toPath Path to copy to
  */
-- (BOOL)copyContentsOfPath:(nonnull NSString *)fromPath toFileAtPath:(nonnull NSString *)toPath progress:(BOOL (^_Nullable)(NSUInteger copied, NSUInteger totalBytes))progress;
+- (BOOL)copyContentsOfPath:(NSString *)fromPath toFileAtPath:(NSString *)toPath progress:(BOOL (^)(NSUInteger copied, NSUInteger totalBytes))progress;
 
 @end
